@@ -84,6 +84,7 @@
 #endif
 #if defined(USE_MEMKIND)
 #define HAVE_DEFRAG_MEMKIND
+void pmem_init();
 #endif
 
 void *zmalloc(size_t size);
@@ -108,6 +109,7 @@ size_t zmalloc_get_threshold(void);
 void *zmalloc_dram(size_t size);
 void *zcalloc_dram(size_t size);
 void *zrealloc_dram(void *ptr, size_t size);
+void *zmalloc_buffer(size_t size);
 
 #ifdef HAVE_DEFRAG
 void zfree_no_tcache(void *ptr);

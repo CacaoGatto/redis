@@ -95,6 +95,7 @@ configEnum memory_alloc_policy_enum[] = {
     {"only-dram", MEM_POLICY_ONLY_DRAM},
     {"only-pmem", MEM_POLICY_ONLY_PMEM},
     {"threshold", MEM_POLICY_THRESHOLD},
+    {"buffer-pmem", MEM_POLICY_BUFFER_PMEM},
     {"ratio", MEM_POLICY_RATIO},
     {NULL, 0}
 };

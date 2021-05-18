@@ -78,9 +78,22 @@ void zlibc_free(void *ptr) {
 #define malloc(size) memkind_malloc(MEMKIND_DEFAULT,size)
 #define calloc(count,size) memkind_calloc(MEMKIND_DEFAULT,count,size)
 #define realloc_dram(ptr,size) memkind_realloc(MEMKIND_DEFAULT,ptr,size)
-#define realloc_pmem(ptr,size) memkind_realloc(MEMKIND_DAX_KMEM,ptr,size)
+#define realloc_pmem(ptr,size) memkind_realloc(pmem_kind,ptr,size)
 #define free_dram(ptr) memkind_free(MEMKIND_DEFAULT,ptr)
-#define free_pmem(ptr) memkind_free(MEMKIND_DAX_KMEM,ptr)
+#define free_pmem(ptr) memkind_free(pmem_kind,ptr)
+
+struct memkind *pmem_kind = NULL;
+
+void pmem_init() {
+#ifdef EXP_FUNC
+    char nvm_path[32] = "/home/yuxiuyuan/mnt"
+    int err = memkind_create_pmem(nvm_path, (64L << 30), &pmem_kind);
+    if (err) exit(err);
+#else
+    pmem_kind = MEMKIND_DAX_KMEM;
+#endif
+}
+
 #endif
 
 #ifndef USE_MEMKIND
@@ -202,7 +215,7 @@ static void zfree_pmem(void *ptr) {
 }
 
 static void *zmalloc_pmem(size_t size) {
-    void *ptr = memkind_malloc(MEMKIND_DAX_KMEM, size+PREFIX_SIZE);
+    void *ptr = memkind_malloc(pmem_kind, size+PREFIX_SIZE);
     if (!ptr && errno==ENOMEM) zmalloc_oom_handler(size);
 #ifdef HAVE_MALLOC_SIZE
     update_zmalloc_pmem_stat_alloc(zmalloc_size(ptr));
@@ -215,7 +228,7 @@ static void *zmalloc_pmem(size_t size) {
 }
 
 static void *zcalloc_pmem(size_t size) {
-    void *ptr = memkind_calloc(MEMKIND_DAX_KMEM, 1, size+PREFIX_SIZE);
+    void *ptr = memkind_calloc(pmem_kind, 1, size+PREFIX_SIZE);
 
     if (!ptr && errno==ENOMEM) zmalloc_oom_handler(size);
 #ifdef HAVE_MALLOC_SIZE
@@ -264,6 +277,10 @@ static void *zrealloc_pmem(void *ptr, size_t size) {
 
 void *zmalloc(size_t size) {
     return (size < pmem_threshold) ? zmalloc_dram(size) : zmalloc_pmem(size);
+}
+
+void *zmalloc_buffer(size_t size) {
+    return zcalloc_pmem(size);
 }
 
 /* Allocation and free functions that bypass the thread cache
