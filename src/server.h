@@ -483,8 +483,6 @@ typedef long long ustime_t; /* microsecond time type. */
 #define MEM_POLICY_ONLY_PMEM 1          /* only use PMEM */
 #define MEM_POLICY_RATIO     2          /* use DRAM and PMEM - ratio variant*/
 #define MEM_POLICY_THRESHOLD 3          /* use DRAM and PMEM - threshold variant*/
-#define MEM_POLICY_BUFFER_PMEM 4
-int pmem_buffer = 0;
 
 struct RedisModule;
 struct RedisModuleIO;

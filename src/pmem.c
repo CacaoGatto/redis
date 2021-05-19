@@ -60,13 +60,6 @@ void pmemThresholdInit(void)
 #endif
             zmalloc_set_threshold(server.static_threshold);
             break;
-        case MEM_POLICY_BUFFER_PMEM:
-#if defined(USE_MEMKIND)
-            pmem_init();
-            pmem_buffer = 1;
-#endif
-            zmalloc_set_threshold(UINT_MAX);
-            break;
         case MEM_POLICY_RATIO:
 #if defined(USE_MEMKIND)
             pmem_init();
